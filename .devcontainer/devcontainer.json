@@ -1,0 +1,19 @@
+{
+    "name": "cosmo-dev",
+    "image": "docker.io/joseamador95/devcontainer:main",
+    "remoteEnv": {
+        "CMAKE_GENERATOR": "Ninja"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "albert.TabOut",
+                "ms-vscode.cmake-tools",
+                "llvm-vs-code-extensions.vscode-clangd",
+                "JacquesLucke.gcov-viewer",
+                "numaru.vscode-ceedling-test-adapter",
+                "ms-vscode.cpptools"
+            ]
+        }
+    }
+}
