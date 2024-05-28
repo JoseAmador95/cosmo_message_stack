@@ -23,8 +23,11 @@ set(CMOCK_CONFIG ${CMAKE_CURRENT_LIST_DIR}/cmock.yml)
 set(CMOCK_EXE ${cmock_SOURCE_DIR}/lib/cmock.rb)
 set(RUNNER_OUTPUT_DIR ${CMOCK_WORK_DIR}/runners) 
 set(RUNNER_EXE ${unity_SOURCE_DIR}/auto/generate_test_runner.rb)
+set(RESULTS_DIR ${PROJECT_BINARY_DIR}/results)
 file(MAKE_DIRECTORY ${CMOCK_OUTPUT_DIR})
 file(MAKE_DIRECTORY ${RUNNER_OUTPUT_DIR})
+file(MAKE_DIRECTORY ${RESULTS_DIR})
+
 
 add_library(cmock STATIC ${cmock_SOURCE_DIR}/src/cmock.c)
 target_include_directories(cmock PUBLIC ${cmock_SOURCE_DIR}/src)
@@ -80,5 +83,15 @@ function(add_unit_test)
         target_sources(${UT_NAME} PRIVATE ${MOCK_SOURCE})
     endforeach()
 
+    target_compile_options(${UT_TARGET} PUBLIC --coverage)
+    target_link_libraries(${UT_NAME} PRIVATE gcov)
+
     add_test(NAME ${UT_NAME} COMMAND ${UT_NAME})
 endfunction()
+
+add_custom_target(
+    gcovr
+    COMMAND gcovr --root ${PROJECT_SOURCE_DIR} --print-summary --html-details ${PROJECT_BINARY_DIR}/results/coverage.html
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Generate coverage report"
+)
