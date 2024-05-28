@@ -30,6 +30,12 @@ jobs:
 
     - name: Unit Tests
       run: cmake --preset default
+    
+    - name: Code Coverage
+      run: cmake --build --preset default --target gcovr
+
+    - name: Code Formatting
+      run: cmake --build --preset default --target clangformat
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
