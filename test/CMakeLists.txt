@@ -1,16 +1,17 @@
-include(FetchContent)
+include(${CMAKE_CURRENT_LIST_DIR}/support/ceedling.cmake)
 
-FetchContent_Declare(
-    ceedling
-    GIT_REPOSITORY https://github.com/ThrowTheSwitch/Ceedling.git
-    GIT_TAG        v0.31.1
+add_unit_test(
+    NAME test_application
+    UNIT_TEST ${PROJECT_SOURCE_DIR}/source/application/test/test_cosmo_application.c
+    TARGET ${PROJECT_NAME}_application
+    MOCK_HEADERS ${PROJECT_SOURCE_DIR}/source/application/public_inc/cosmo_application_config.h
+                 ${PROJECT_SOURCE_DIR}/source/utils/public_inc/cosmo_alloc.h
 )
 
-FetchContent_MakeAvailable(ceedling)
-
-add_subdirectory(${ceedling_SOURCE_DIR}/vendor/unity ${ceedling_BINARY_DIR}/vendor/unity)
-
-set(CMOCK_SRC_DIR ${ceedling_SOURCE_DIR}/vendor/cmock/src)
-add_library(cmock STATIC ${CMOCK_SRC_DIR}/cmock.c)
-target_include_directories(cmock PUBLIC ${CMOCK_SRC_DIR} ${PROJECT_BINARY_DIR}/ceedling/test/mocks)
-target_link_libraries(cmock PUBLIC unity)
+add_unit_test(
+    NAME test_network
+    UNIT_TEST ${PROJECT_SOURCE_DIR}/source/network/test/test_cosmo_network.c
+    TARGET ${PROJECT_NAME}_network
+    MOCK_HEADERS ${PROJECT_SOURCE_DIR}/source/network/public_inc/cosmo_network_config.h
+                 ${PROJECT_SOURCE_DIR}/source/utils/public_inc/cosmo_alloc.h
+)

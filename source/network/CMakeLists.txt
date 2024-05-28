@@ -9,6 +9,3 @@ add_library(${COMPONENT_NAME} STATIC
 )
 target_include_directories(${COMPONENT_NAME} PUBLIC ${INC_DIR})
 target_link_libraries(${COMPONENT_NAME} PUBLIC ${PROJECT_NAME}_utils)
-
-add_executable(test_network ${TEST_DIR}/test_cosmo_network.c)
-target_link_libraries(test_network ${COMPONENT_NAME} cmock unity)
