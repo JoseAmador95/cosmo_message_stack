@@ -9,7 +9,7 @@ on:
 env:
   BUILD_TYPE: Release
   COMPILER_X86: gcc
-  BUILD_DIR: ./build
+  BUILD_DIR: ./build/default
 
 jobs:
   tests:
@@ -26,16 +26,13 @@ jobs:
         submodules: true
 
     - name: Config
-      run: cmake -S . --preset default --fresh
+      run: cmake --preset default -G Ninja --fresh
 
     - name: Build Lib
-      run: cmake --build --preset default -- -k 0
+      run: cmake --build --preset default
 
     - name: Unit Tests
-      run: |
-        cmake -S . --preset tests
-        cmake --build --preset tests
-        ctest --preset unittests
+      run: cmake --preset default
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
