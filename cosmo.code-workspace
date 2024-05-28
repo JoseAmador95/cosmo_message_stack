@@ -7,14 +7,17 @@
 	"settings": {
 		"C_Cpp.intelliSenseEngine": "disabled",
 		"cmake.cmakePath": "cmake",
-		"ceedlingExplorer.debugConfiguration": "Ceedling Test Explorer Debug",
 		"files.associations": {
-			".clang-*": "yaml",
+			".clang*": "yaml",
 			"*.h": "c",
 			"*.c": "c",
 		},
 		"gcovViewer.buildDirectories": [
 			"${workspaceFolder}/build/ceedling/gcov/out"
 		],
+		"clangd.arguments": [
+			"--completion-style=bundled"
+		],
+		"clangd.onConfigChanged": "restart",
 	},
 }
