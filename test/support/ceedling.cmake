@@ -86,6 +86,9 @@ function(add_unit_test)
     target_compile_options(${UT_TARGET} PUBLIC --coverage)
     target_link_libraries(${UT_NAME} PRIVATE gcov)
 
+    set_target_properties(${UT_NAME} PROPERTIES C_CLANG_TIDY "")
+    set_target_properties(${UT_TARGET} PROPERTIES C_CLANG_TIDY "clang-tidy")
+
     add_test(NAME ${UT_NAME} COMMAND ${UT_NAME})
 endfunction()
 
@@ -94,4 +97,16 @@ add_custom_target(
     COMMAND gcovr --root ${PROJECT_SOURCE_DIR} --print-summary --html-details ${PROJECT_BINARY_DIR}/results/coverage.html
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generate coverage report"
+)
+
+file(GLOB_RECURSE ALL_SOURCE_FILES ${PROJECT_SOURCE_DIR}/source/*.c ${PROJECT_SOURCE_DIR}/source/*.h)
+
+add_custom_target(
+    clangformat
+    ALL
+    COMMAND clang-format
+    -style=file
+    -dry-run
+    --Werror
+    ${ALL_SOURCE_FILES}
 )

@@ -1,5 +1,6 @@
 ---
 Checks: >
+  -*,
   bugprone-assert-side-effect,
   bugprone-assignment-in-if-condition,
   bugprone-bool-pointer-implicit-conversio,
@@ -25,11 +26,12 @@ Checks: >
   bugprone-terminating-continue,
   bugprone-too-small-loop-variable,
   clang-analyzer-core*,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
   cppcoreguidelines-init-variables,
   cppcoreguidelines-avoid-goto,
   hicpp-multiway-paths-covered,
   hicpp-signed-bitwise,
-  # llvm-header-guard,
+  llvm-header-guard,
   llvm-include-order,
   misc-definitions-in-headers,
   misc-misplaced-const,
@@ -91,7 +93,6 @@ WarningsAsErrors: >
   readability-function-cognitive-complexity,
   readability-function-size,
   cert-flp30-c,
-AnalyzeTemporaryDtors: false
 FormatStyle: file
 CheckOptions:
   - key: bugprone-assert-side-effect.AssertMacros
