@@ -1,4 +1,4 @@
 CompileFlags:
-    CompilationDatabase: "./build"
+    CompilationDatabase: "./build/default"
 Index:
     Background: Build # Enable background indexing
