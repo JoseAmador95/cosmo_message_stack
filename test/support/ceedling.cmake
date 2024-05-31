@@ -47,7 +47,13 @@ function(add_unit_test)
         target_add_sanitizer(${UT_TARGET} PUBLIC)
     endif()
 
-    set_target_properties(${UT_NAME} PROPERTIES SKIP_LINTING ON)
+    set_target_properties(
+        ${UT_NAME}
+        PROPERTIES
+            C_CLANG_TIDY ""
+            CXX_CLANG_TIDY ""
+            SKIP_LINTING TRUE
+    )
 
     add_test(NAME ${UT_NAME} COMMAND ${UT_NAME})
 endfunction()

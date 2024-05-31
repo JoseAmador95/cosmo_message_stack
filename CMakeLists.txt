@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(C_CLANG_TIDY "clang-tidy")
+include(test/support/clangtidy.cmake)
+set_clang_tidy(ON)
 
 project(cosmo_message_stack C)
 

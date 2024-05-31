@@ -39,12 +39,14 @@ file(MAKE_DIRECTORY ${RUNNER_OUTPUT_DIR})
 add_library(cmock STATIC ${cmock_repo_SOURCE_DIR}/src/cmock.c)
 target_include_directories(cmock PUBLIC ${cmock_repo_SOURCE_DIR}/src)
 target_link_libraries(cmock PUBLIC unity)
+set_target_properties(cmock PROPERTIES C_CLANG_TIDY "" SKIP_LINTING TRUE)
+set_target_properties(unity PROPERTIES C_CLANG_TIDY "" SKIP_LINTING TRUE)
 
 function(mock_header _header _mock_source)
     cmake_path(GET _header STEM _header_name)
     set(MOCK_SOURCE ${CMOCK_MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.c)
     add_custom_command(
-        OUTPUT "${MOCK_SOURCE}"
+        OUTPUT ${MOCK_SOURCE}
         COMMAND ${Ruby_EXECUTABLE} ${CMOCK_EXE} ${_header} -o${CMOCK_GENERATED_CONFIG_FILE}
         WORKING_DIRECTORY ${CMOCK_OUTPUT_DIR}
         MAIN_DEPENDENCY ${_header}
@@ -60,7 +62,7 @@ function(generate_runner _test_source _runner_source)
     cmake_path(GET _test_source STEM _test_name)
     set(RUNNER_SOURCE ${RUNNER_OUTPUT_DIR}/${_test_name}_runner.c)
     add_custom_command(
-        OUTPUT "${RUNNER_SOURCE}"
+        OUTPUT ${RUNNER_SOURCE}
         COMMAND ${Ruby_EXECUTABLE} ${RUNNER_EXE} ${CMOCK_GENERATED_CONFIG_FILE} ${_test_source} ${RUNNER_SOURCE}
         DEPENDS ${_test_source} 
                 ${CMOCK_GENERATED_CONFIG_FILE}
