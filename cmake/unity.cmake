@@ -23,7 +23,7 @@ find_package(Ruby REQUIRED)
 set(CMOCK_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE STRING "Output directory for mock files")
 set(CMOCK_MOCK_PREFIX mock_ CACHE STRING "Prefix for mock files")
 set(CMOCK_MOCK_SUFFIX "" CACHE STRING "Suffix for mock files")
-set(CMOCK_CONFIG_FILE ${CMAKE_CURRENT_LIST_DIR}/cmock.yml CACHE STRING "Configuration file for CMock")
+set(CMOCK_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmock.yml CACHE STRING "Configuration file for CMock")
 
 set(CMOCK_GENERATED_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/cmock.yml)
 set(CMOCK_MOCK_SUBDIR mocks)

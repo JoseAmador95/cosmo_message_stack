@@ -1,4 +1,4 @@
-include(${CMAKE_CURRENT_LIST_DIR}/support/ceedling.cmake)
+include(ceedling)
 
 add_unit_test(
     NAME test_application

@@ -5,14 +5,19 @@
             "name": "default",
             "displayName": "Default Config",
             "description": "Default build",
-            "binaryDir": "${sourceDir}/build/default"
+            "binaryDir": "${sourceDir}/build/default",
+            "cacheVariables": {
+                "CEEDLING_ENABLE_GCOV": "ON",
+                "CEEDLING_ENABLE_SANITIZER": "ON",
+                "CMOCK_CONFIG_FILE": "${sourceDir}/test/support/cmock.yml"
+            }
         }
     ],
     "buildPresets": [
         {
             "name": "default",
             "configurePreset": "default",
-            "cleanFirst": true,
+            "cleanFirst": false,
             "targets": "all"
         }
     ],

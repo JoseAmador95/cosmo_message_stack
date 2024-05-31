@@ -12,7 +12,7 @@ if(CLANG_FORMAT_USE_FILE)
     set(STYLE --style=file:${CLANG_FORMAT_CONFIG_FILE})
 endif()
 
-file(GLOB_RECURSE ALL_SOURCE_FILES ${PROJECT_SOURCE_DIR}/source/*.c ${PROJECT_SOURCE_DIR}/source/*.h)
+file(GLOB_RECURSE ALL_SOURCE_FILES ${CMAKE_SOURCE_DIR}/source/*.c ${CMAKE_SOURCE_DIR}/source/*.h)
 
 add_custom_target(
     clangformat_check
