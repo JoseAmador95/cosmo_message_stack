@@ -32,10 +32,10 @@ jobs:
       run: ctest --preset default
     
     - name: Code Coverage
-      run: cmake --build --preset default --target gcovr
+      run: cmake --build --preset default --target gcovr_html
 
     - name: Code Formatting
-      run: cmake --build --preset default --target clangformat
+      run: cmake --build --preset default --target clangformat_check
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
