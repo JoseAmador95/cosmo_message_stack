@@ -1,76 +1,30 @@
-include(FetchContent)
+option(CEEDLING_ENABLE_GCOV "Enable coverage" OFF)
+option(CEEDLING_ENABLE_SANITIZER "Enable sanitizer" OFF)
+option(CEEDLING_SANITIZER_DEFAULT "Enable sanitizer by default" ON)
 
-FetchContent_Declare(
-    cmock
-    GIT_REPOSITORY https://github.com/ThrowTheSwitch/CMock.git
-    GIT_TAG        v2.5.3
-)
-FetchContent_MakeAvailable(cmock)
+if(CEEDLING_ENABLE_GCOV)
+    include(${CMAKE_CURRENT_LIST_DIR}/gcov.cmake)
+endif()
 
-FetchContent_Declare(
-    unity
-    GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git
-    GIT_TAG        v2.6.0
-)
-FetchContent_MakeAvailable(unity)
+if(CEEDLING_ENABLE_SANITIZER)
+    include(${CMAKE_CURRENT_LIST_DIR}/sanitizer.cmake)
+endif()
 
-find_package(Ruby REQUIRED)
-
-set(CMOCK_WORK_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set(CMOCK_OUTPUT_DIR ${CMOCK_WORK_DIR}/mocks)
-set(CMOCK_PRESET mock_)
-set(CMOCK_CONFIG ${CMAKE_CURRENT_LIST_DIR}/cmock.yml)
-set(CMOCK_EXE ${cmock_SOURCE_DIR}/lib/cmock.rb)
-set(RUNNER_OUTPUT_DIR ${CMOCK_WORK_DIR}/runners) 
-set(RUNNER_EXE ${unity_SOURCE_DIR}/auto/generate_test_runner.rb)
-set(RESULTS_DIR ${PROJECT_BINARY_DIR}/results)
-file(MAKE_DIRECTORY ${CMOCK_OUTPUT_DIR})
-file(MAKE_DIRECTORY ${RUNNER_OUTPUT_DIR})
-file(MAKE_DIRECTORY ${RESULTS_DIR})
-
-
-add_library(cmock STATIC ${cmock_SOURCE_DIR}/src/cmock.c)
-target_include_directories(cmock PUBLIC ${cmock_SOURCE_DIR}/src)
-target_link_libraries(cmock PUBLIC unity)
-
-function(mock_header _header _mock_source)
-    cmake_path(GET _header STEM _header_name)
-    set(MOCK_SOURCE "${CMOCK_OUTPUT_DIR}/${CMOCK_PRESET}${_header_name}.c")
-    add_custom_command(
-        OUTPUT "${MOCK_SOURCE}"
-        COMMAND ${RUBY_EXECUTABLE} ${CMOCK_EXE} ${_header} -o${CMOCK_CONFIG}
-        WORKING_DIRECTORY ${CMOCK_WORK_DIR}
-        MAIN_DEPENDENCY ${_header}
-        DEPENDS ${CMOCK_CONFIG} 
-                ${_header}
-                ${RUBY_EXECUTABLE}
-        COMMENT "Generate a mock for ${_header}"
-    )
-    set(${_mock_source} ${MOCK_SOURCE} PARENT_SCOPE)
-endfunction()
-
-function(generate_runner _test_source _runner_source)
-    cmake_path(GET _test_source STEM _test_name)
-    set(RUNNER_SOURCE "${RUNNER_OUTPUT_DIR}/${_test_name}_runner.c")
-    add_custom_command(
-        OUTPUT "${RUNNER_SOURCE}"
-        COMMAND ${RUBY_EXECUTABLE} ${RUNNER_EXE} ${CMOCK_CONFIG} ${_test_source} ${RUNNER_SOURCE}
-        DEPENDS ${_test_source} 
-                ${CMOCK_CONFIG}
-                ${RUBY_EXECUTABLE}
-        COMMENT "Generate a test runner for ${_test_source}"
-    )
-    set(${_runner_source} ${RUNNER_SOURCE} PARENT_SCOPE)
-endfunction()
+include(${CMAKE_CURRENT_LIST_DIR}/clangformat.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/unity.cmake)
 
 function(add_unit_test)
-    set(options)
+    set(options DISABLE_SANITIZER ENABLE_SANITIZER)
     set(oneValueArgs NAME UNIT_TEST TARGET)
     set(multiValueArgs MOCK_HEADERS)
     cmake_parse_arguments(UT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    if(UT_DISABLE_SANITIZER AND UT_ENABLE_SANITIZER)
+        message(FATAL_ERROR "Cannot enable and disable sanitizer at the same time")
+    endif()
+
     add_executable(${UT_NAME} ${UT_UNIT_TEST})
-    target_include_directories(${UT_NAME} PRIVATE ${CMOCK_OUTPUT_DIR})
+    target_include_directories(${UT_NAME} PRIVATE ${CMOCK_MOCK_DIR})
     target_link_libraries(${UT_NAME} PRIVATE ${UT_TARGET} cmock unity)
 
     unset(RUNNER_SOURCE)
@@ -83,30 +37,17 @@ function(add_unit_test)
         target_sources(${UT_NAME} PRIVATE ${MOCK_SOURCE})
     endforeach()
 
-    target_compile_options(${UT_TARGET} PUBLIC --coverage)
-    target_link_libraries(${UT_NAME} PRIVATE gcov)
+    if(CEEDLING_ENABLE_GCOV)
+        target_add_gcov(${UT_TARGET} PUBLIC)
+    endif()
 
-    set_target_properties(${UT_NAME} PROPERTIES C_CLANG_TIDY "")
-    set_target_properties(${UT_TARGET} PROPERTIES C_CLANG_TIDY "clang-tidy")
+    if(CEEDLING_ENABLE_SANITIZER AND 
+       ((CEEDLING_SANITIZER_DEFAULT AND NOT UT_DISABLE_SANITIZER) OR 
+        (NOT CEEDLING_SANITIZER_DEFAULT AND UT_ENABLE_SANITIZER)))
+        target_add_sanitizer(${UT_TARGET} PUBLIC)
+    endif()
+
+    set_target_properties(${UT_NAME} PROPERTIES SKIP_LINTING ON)
 
     add_test(NAME ${UT_NAME} COMMAND ${UT_NAME})
 endfunction()
-
-add_custom_target(
-    gcovr
-    COMMAND gcovr --root ${PROJECT_SOURCE_DIR} --print-summary --html-details ${PROJECT_BINARY_DIR}/results/coverage.html
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    COMMENT "Generate coverage report"
-)
-
-file(GLOB_RECURSE ALL_SOURCE_FILES ${PROJECT_SOURCE_DIR}/source/*.c ${PROJECT_SOURCE_DIR}/source/*.h)
-
-add_custom_target(
-    clangformat
-    ALL
-    COMMAND clang-format
-    -style=file
-    -dry-run
-    --Werror
-    ${ALL_SOURCE_FILES}
-)

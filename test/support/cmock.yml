@@ -11,10 +11,10 @@
   :when_no_prototypes: :warn # the options being :ignore, :warn, or :erro
 
   # File configuration
-  :mock_path: "mocks" # Subdirectory to store mocks when generated (default: mocks)
+  :mock_path: "@CMOCK_MOCK_SUBDIR@" # Subdirectory to store mocks when generated (default: mocks)
   :skeleton_path: "" # Subdirectory to store stubs when generated (default: '')
-  :mock_prefix: "mock_" # Prefix to append to filenames for mocks
-  :mock_suffix: "" # Suffix to append to filenames for mocks
+  :mock_prefix: "@CMOCK_MOCK_PREFIX@" # Prefix to append to filenames for mocks
+  :mock_suffix: "@CMOCK_MOCK_SUFFIX@" # Suffix to append to filenames for mocks
 
   # Parser configuration
   :strippables: ['(?:__attribute__\s*\([ (]*.*?[ )]*\)+)']
