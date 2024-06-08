@@ -7,8 +7,14 @@
             "description": "Default build",
             "binaryDir": "${sourceDir}/build/default",
             "cacheVariables": {
-                "CEEDLING_ENABLE_GCOV": "ON",
-                "CEEDLING_ENABLE_SANITIZER": "ON",
+                "CEEDLING_ENABLE_GCOV": {
+                    "type": "BOOL",
+                    "value": "ON"
+                },
+                "CEEDLING_ENABLE_SANITIZER": {
+                    "type": "BOOL",
+                    "value": "ON"
+                },
                 "CMOCK_CONFIG_FILE": "${sourceDir}/test/support/cmock.yml"
             }
         }
