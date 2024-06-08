@@ -1,3 +1,5 @@
+include_guard(GLOBAL)
+
 set(UNITY_REPO https://github.com/ThrowTheSwitch/Unity.git CACHE STRING "Unity repository")
 set(UNITY_TAG v2.6.0 CACHE STRING "Unity tag")
 set(CMOCK_REPO https://github.com/ThrowTheSwitch/CMock.git CACHE STRING "CMock repository")
@@ -42,11 +44,12 @@ target_link_libraries(cmock PUBLIC unity)
 set_target_properties(cmock PROPERTIES C_CLANG_TIDY "" SKIP_LINTING TRUE)
 set_target_properties(unity PROPERTIES C_CLANG_TIDY "" SKIP_LINTING TRUE)
 
-function(mock_header _header _mock_source)
+function(mock_header _header _mock_source _mock_header)
     cmake_path(GET _header STEM _header_name)
     set(MOCK_SOURCE ${CMOCK_MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.c)
+    set(MOCK_HEADER ${CMOCK_MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.h)
     add_custom_command(
-        OUTPUT ${MOCK_SOURCE}
+        OUTPUT ${MOCK_SOURCE} ${MOCK_HEADER}
         COMMAND ${Ruby_EXECUTABLE} ${CMOCK_EXE} ${_header} -o${CMOCK_GENERATED_CONFIG_FILE}
         WORKING_DIRECTORY ${CMOCK_OUTPUT_DIR}
         MAIN_DEPENDENCY ${_header}
@@ -56,6 +59,7 @@ function(mock_header _header _mock_source)
         COMMENT "Generate a mock for ${_header}"
     )
     set(${_mock_source} ${MOCK_SOURCE} PARENT_SCOPE)
+    set(${_mock_header} ${MOCK_HEADER} PARENT_SCOPE)
 endfunction()
 
 function(generate_runner _test_source _runner_source)
