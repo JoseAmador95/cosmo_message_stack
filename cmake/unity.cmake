@@ -54,7 +54,6 @@ function(mock_header _header _mock_source _mock_header _output_dir)
         OUTPUT ${MOCK_SOURCE} ${MOCK_HEADER}
         COMMAND ${Ruby_EXECUTABLE} ${CMOCK_EXE} ${_header} -o${CMOCK_GENERATED_CONFIG_FILE}
         WORKING_DIRECTORY ${_output_dir}
-        MAIN_DEPENDENCY ${_header}
         DEPENDS ${CMOCK_GENERATED_CONFIG_FILE} 
                 ${_header}
                 ${Ruby_EXECUTABLE}
