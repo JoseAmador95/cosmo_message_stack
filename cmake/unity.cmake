@@ -44,14 +44,16 @@ target_link_libraries(cmock PUBLIC unity)
 set_target_properties(cmock PROPERTIES C_CLANG_TIDY "" SKIP_LINTING TRUE)
 set_target_properties(unity PROPERTIES C_CLANG_TIDY "" SKIP_LINTING TRUE)
 
-function(mock_header _header _mock_source _mock_header)
+function(mock_header _header _mock_source _mock_header _output_dir)
     cmake_path(GET _header STEM _header_name)
-    set(MOCK_SOURCE ${CMOCK_MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.c)
-    set(MOCK_HEADER ${CMOCK_MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.h)
+    set(MOCK_DIR ${_output_dir}/${CMOCK_MOCK_SUBDIR})
+    file(MAKE_DIRECTORY ${MOCK_DIR})
+    set(MOCK_SOURCE ${MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.c)
+    set(MOCK_HEADER ${MOCK_DIR}/${CMOCK_MOCK_PREFIX}${_header_name}.h)
     add_custom_command(
         OUTPUT ${MOCK_SOURCE} ${MOCK_HEADER}
         COMMAND ${Ruby_EXECUTABLE} ${CMOCK_EXE} ${_header} -o${CMOCK_GENERATED_CONFIG_FILE}
-        WORKING_DIRECTORY ${CMOCK_OUTPUT_DIR}
+        WORKING_DIRECTORY ${_output_dir}
         MAIN_DEPENDENCY ${_header}
         DEPENDS ${CMOCK_GENERATED_CONFIG_FILE} 
                 ${_header}
