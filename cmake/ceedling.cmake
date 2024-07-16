@@ -42,22 +42,12 @@ function(add_unit_test)
         COMMENT "Move ${RUNNER_STEM} to ${TEST_BINARY_DIR}"
     )
     target_sources(${UT_NAME} PRIVATE ${TEST_RUNNER})
-    target_include_directories(${UT_NAME} PRIVATE ${TEST_BINARY_DIR})
+    target_include_directories(${UT_NAME} PRIVATE ${TEST_BINARY_DIR}/${CMOCK_MOCK_SUBDIR})
 
     foreach(HEADER IN LISTS UT_MOCK_HEADERS)
         unset(MOCK_SOURCE)
-        mock_header(${HEADER} MOCK_SOURCE MOCK_HEADER)
-        cmake_path(GET MOCK_SOURCE STEM MOCK_STEM)
-        set(TEST_MOCK_SOURCE ${TEST_BINARY_DIR}/${MOCK_STEM}.c)
-        set(TEST_MOCK_HEADER ${TEST_BINARY_DIR}/${MOCK_STEM}.h)
-        add_custom_command(
-            OUTPUT ${TEST_MOCK_SOURCE} ${TEST_MOCK_HEADER}
-            DEPENDS ${MOCK_SOURCE} ${MOCK_HEADER}
-            COMMAND ${CMAKE_COMMAND} -E rename ${MOCK_SOURCE} ${TEST_MOCK_SOURCE}
-            COMMAND ${CMAKE_COMMAND} -E rename ${MOCK_HEADER} ${TEST_MOCK_HEADER}
-            COMMENT "Move ${MOCK_STEM} to ${TEST_BINARY_DIR}"
-        )
-        target_sources(${UT_NAME} PRIVATE ${TEST_MOCK_SOURCE} )
+        mock_header(${HEADER} MOCK_SOURCE MOCK_HEADER ${TEST_BINARY_DIR})
+        target_sources(${UT_NAME} PRIVATE ${MOCK_SOURCE})
     endforeach()
 
     if(CEEDLING_ENABLE_GCOV)
